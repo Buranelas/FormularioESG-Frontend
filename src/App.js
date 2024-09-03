@@ -136,7 +136,7 @@ function App() {
   useEffect(() => {
     const fetchMedias = async () => {
       try {
-        const response = await axios.get('http://192.168.110.101:5000/api/medias');
+        const response = await axios.get('http://192.168.111.95:5000/api/medias');
         setMedias(response.data.medias || []);
       } catch (error) {
         console.error('Erro ao buscar as médias', error);
@@ -182,12 +182,12 @@ function App() {
     };
   
     try {
-      await axios.post('http://192.168.110.101:5000/api/respostas', dadosEnvio);
+      await axios.post('http://192.168.111.95:5000/api/respostas', dadosEnvio);
       alert('Respostas enviadas com sucesso!');
       setGrupoSelecionado('');
       setRespostas(temas);
   
-      const response = await axios.get('http://192.168.110.101:5000/api/medias');
+      const response = await axios.get('http://192.168.111.95:5000/api/medias');
       setMedias(response.data.medias || []);
     } catch (error) {
       console.error('Erro ao enviar respostas', error);
