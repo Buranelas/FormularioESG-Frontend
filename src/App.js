@@ -18,6 +18,8 @@ function App() {
   const temas = {
     tema1: {
       titulo: "Trilha Ambiental",
+	  descricao: "Selecione uma posição para cara tema (não pode haver repetições).",
+	  descricao2: "Para mais informações do tema, clique em ⬇",
       perguntas: [
         {
           titulo: "Práticas de conservação de água.",
@@ -52,6 +54,8 @@ function App() {
     },
     tema2: {
       titulo: "Trilha Social",
+	  descricao: "Selecione uma posição para cara tema (não pode haver repetições).",
+	  descricao2: "Para mais informações do tema, clique em ⬇",
       perguntas: [
         {
           titulo: "Gestão de saúde e segurança do trabalho",
@@ -86,6 +90,8 @@ function App() {
     },
     tema3: {
       titulo: "Trilha Governança",
+	  descricao: "Selecione uma posição para cara tema (não pode haver repetições).",
+	  descricao2: "Para mais informações do tema, clique em ⬇",
       perguntas: [
         {
           titulo: "Segurança alimentar",
@@ -130,13 +136,18 @@ function App() {
   const [medias, setMedias] = useState([]);
   const [senha, setSenha] = useState(''); // Estado para armazenar a senha digitada
   const [senhaCorreta, setSenhaCorreta] = useState(false); // Estado para controlar a exibição das médias
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [currentTema, setCurrentTema] = useState(0); // Controla o tema visível
+  const [showConcept, setShowConcept] = useState({}); // Controla a exibição do conceito para cada tema
 
+  
   const senhaPreDefinida = 'Prima@97'; // Defina a senha aqui
 
   useEffect(() => {
     const fetchMedias = async () => {
       try {
-        const response = await axios.get('http://192.168.111.95:5000/api/medias');
+        const response = await axios.get('http://200.195.186.252:5051/api/medias');
         setMedias(response.data.medias || []);
       } catch (error) {
         console.error('Erro ao buscar as médias', error);
@@ -144,28 +155,52 @@ function App() {
     };
     fetchMedias();
   }, []);
+  
+  // Função para lidar com a troca de trilha
+  const handleNextTema = () => {
+    if (currentTema < Object.keys(temas).length - 1) {
+      setCurrentTema(currentTema + 1);
+    }
+  };
+
+  // Verifica se todas as perguntas do tema atual estão respondidas
+  const isCurrentTemaComplete = () => {
+    const temaAtual = Object.keys(temas)[currentTema];
+    return respostas[temaAtual].respostas.every(resposta => resposta !== null);
+  };
 
   const handleChangeGrupo = (e) => {
     setGrupoSelecionado(e.target.value);
   };
 
-  const handleChange = (tema, index, value) => {
+  const handleChange = (tema, perguntaIndex, valor) => {
     const novasRespostas = { ...respostas };
-
-    // Se a posição já estiver marcada, desmarque-a (toggle)
-    if (novasRespostas[tema].respostas[index] === value) {
-      novasRespostas[tema].respostas[index] = null;
-    } else {
-      if (novasRespostas[tema].respostas.includes(value)) {
-        setErro(`A posição ${value} já foi escolhida para outra pergunta dentro do ${tema}!`);
+    
+    // Se a opção já estiver marcada, desmarque-a
+    if (novasRespostas[tema].respostas[perguntaIndex] === valor) {
+        novasRespostas[tema].respostas[perguntaIndex] = null;  // Desmarca a opção
+        setRespostas(novasRespostas);
+        setErro('');
         return;
-      }
-      novasRespostas[tema].respostas[index] = value;
     }
 
+    // Verifica se o valor já foi selecionado em outra pergunta dentro do mesmo tema
+    if (novasRespostas[tema].respostas.includes(valor)) {
+        setPopupMessage(`A posição ${valor}º já foi escolhida para outra pergunta dentro do ${temas[tema].titulo}!`);
+        setShowPopup(true);
+        return;
+    }
+
+    // Marca a nova opção
+    novasRespostas[tema].respostas[perguntaIndex] = valor;
     setRespostas(novasRespostas);
     setErro('');
-  };
+};
+  
+  // Fechar o pop-up
+  //const closePopup = () => {
+  //  setShowPopup(false);
+  //};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -182,15 +217,20 @@ function App() {
     };
   
     try {
-      await axios.post('http://192.168.111.95:5000/api/respostas', dadosEnvio);
+      await axios.post('http://200.195.186.252:5051/api/respostas', dadosEnvio);
+	  setPopupMessage('Obrigado por compartilhar sua opnião!');
+	  setShowPopup(true);
       alert('Respostas enviadas com sucesso!');
       setGrupoSelecionado('');
       setRespostas(temas);
   
-      const response = await axios.get('http://192.168.111.95:5000/api/medias');
+      const response = await axios.get('http://200.195.186.252:5051/api/medias');
       setMedias(response.data.medias || []);
+	  
     } catch (error) {
       console.error('Erro ao enviar respostas', error);
+	  setPopupMessage('Erro ao enviar respostas. Por favor, tente novamente.');
+	  setShowPopup(true);
       alert('Erro ao enviar respostas');
     }
   };
@@ -200,46 +240,84 @@ function App() {
     if (senha === senhaPreDefinida) {
       setSenhaCorreta(true);
     } else {
-      alert('Senha incorreta');
+      setPopupMessage('Senha Inválida. Por favor, tente novamente.');
+      setShowPopup(true);
     }
   };
 
   return (
-    <div className="App">
-      <h1>Formulário ESG</h1>
-      <p>
-      Essa pesquisa tem por objetivo definir a Matriz de Materialidade da Cooperativa, trabalhada no Programa ESG, para que seja priorizado os temas e foco da empresa, garantindo 
-      que os esforços sejam direcionados ao que é realmente importante.
-        Por favor, organize as posições em cada trilha. 
-        Você deve selecionar uma posição única (1º, 2º, 3º, etc.) para cada pergunta dentro de cada trilha.
-      </p>
-      <form onSubmit={handleSubmit}>
-        <div className="grupo-selecao">
-          <h2>Em qual grupo você está inserido:</h2>
-          {grupos.map((grupo, index) => (
-            <label key={index} className="grupo-label">
-              <input
-                type="radio"
-                name="grupo"
-                value={grupo}
-                checked={grupoSelecionado === grupo}
-                onChange={handleChangeGrupo}
-                required
-              />
-              {grupo}
-            </label>
-          ))}
-        </div>
+  <div className="App">
+    <h1>Formulário ESG</h1>
+    <p>
+      Nós da Primato Cooperativa queremos saber de você, qual o grau de importância nos temas compostos do ESG (Ambiental, Social e Governança). 
+      Vamos montar nossa Matriz de Materialidade, garantindo que os esforços sejam direcionados ao que é realmente importante para a sociedade. 
+      Considere uma nota para cada tema, sendo a 1º posição mais importante. 
+      Você deve selecionar uma posição única (1º, 2º, 3º, etc.) para cada pergunta dentro de cada trilha.
+    </p>
+	<p>
+	  Para descobrir mais sobre cada tema, basta clicar no ícone ao lado "⬇"
+	</p>
 
-        {Object.keys(temas).map((tema, temaIndex) => (
-          <div key={temaIndex}>
-            <h2 className="tema-titulo">{temas[tema].titulo}</h2>
+    {/* Pop-up */}
+    {showPopup && (
+      <div className="popup-overlay" onClick={() => setShowPopup(false)}>
+        <div className="popup">
+          <p>{popupMessage}</p>
+          <button onClick={() => setShowPopup(false)}>Fechar</button>
+        </div>
+      </div>
+    )}
+
+    <form onSubmit={handleSubmit}>
+      <div className="grupo-selecao">
+        <h2>Em qual grupo você está inserido:</h2>
+        {grupos.map((grupo, index) => (
+          <label key={index} className="grupo-label">
+            <input
+              type="radio"
+              name="grupo"
+              value={grupo}
+              checked={grupoSelecionado === grupo}
+              onChange={handleChangeGrupo}
+              required
+            />
+            {grupo}
+          </label>
+        ))}
+      </div>
+
+      {Object.keys(temas).map((tema, temaIndex) => {
+        if (temaIndex !== currentTema) return null; // Mostrar apenas o tema atual
+
+        const temaClass = tema === 'tema1' ? 'tema-ambiental' : tema === 'tema2' ? 'tema-social' : 'tema-governanca';
+
+        return (
+          <div key={temaIndex} className={temaClass}>
+            <h2 className="tema-titulo">
+              {temas[tema].titulo}
+            </h2>
+
+            {/* Exibe a descrição da trilha */}
+            {temas[tema].descricao && <p className="tema-descricao">{temas[tema].descricao}</p>}
+			
+			{/* Exibe a descrição(2) da trilha */}
+            {temas[tema].descricao2 && <p className="tema-descricao">{temas[tema].descricao2}</p>}
+
             {temas[tema].perguntas.map((pergunta, index) => (
               <div key={index} className="question-card">
-                <h3>{`TEMA: ${pergunta.titulo}`}</h3>
-                <p>{`CONCEITO: ${pergunta.conceito}`}</p>
+                <h3>{`TEMA: ${pergunta.titulo}`} 
+                  <span className="info-icon" onClick={() => setShowConcept(prev => ({...prev, [`${tema}-${index}`]: !prev[`${tema}-${index}`]}))}>
+                    ⬇
+                  </span>
+                </h3>
+
+                {/* Exibe o conceito quando o ícone é clicado */}
+                {showConcept[`${tema}-${index}`] && (
+                  <p className="conceito">{pergunta.conceito}</p>
+                )}
+
                 <div className="options">
-                  {[...Array(7)].map((_, i) => (
+                  {[...Array(temas[tema].perguntas.length)].map((_, i) => (
                     <label key={i} className="radio-label">
                       <input
                         type="checkbox"
@@ -253,47 +331,54 @@ function App() {
                   ))}
                 </div>
                 <div className="legendas">
-                  <span>Menos importante</span>
                   <span>Muito importante</span>
+                  <span>Menos importante</span>
                 </div>
               </div>
             ))}
           </div>
-        ))}
-        {erro && <p style={{ color: 'red' }}>{erro}</p>}
-        <button type="submit">Enviar</button>
-      </form>
+        );
+      })}
 
-      <h2>Posição Mais Selecionada por Pergunta</h2>
-      
-      {!senhaCorreta ? (
-        <form onSubmit={handleSenhaSubmit}>
-          <input
-            type="password"
-            placeholder="Digite a senha para ver as médias"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-          />
-          <button type="submit">Ver Posições</button>
-        </form>
-      ) : (
-        <ul>
-          {medias.map((mediaTema, indexTema) => (
-            <li key={indexTema}>
-              <strong>{temas[`tema${indexTema + 1}`]?.titulo || `Tema ${indexTema + 1}`}</strong>
-              <ul>
-                {mediaTema.map((media, indexPergunta) => (
-                  <li key={indexPergunta}>
-                    Pergunta {indexPergunta + 1}: {media !== null ? `${media}º` : 'Nenhuma posição selecionada ainda.'}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+      {erro && <p style={{ color: 'red' }}>{erro}</p>}
+      {currentTema < Object.keys(temas).length - 1 && isCurrentTemaComplete() && (
+        <button type="button" onClick={handleNextTema}>Próximo</button>
       )}
-    </div>
-  );
+
+      {currentTema === Object.keys(temas).length - 1 && (
+        <>
+          <button type="submit">Enviar</button>
+          {senhaCorreta ? (
+            <ul>
+              {medias.map((mediaTema, indexTema) => (
+                <li key={indexTema}>
+                  <strong>{temas[`tema${indexTema + 1}`]?.titulo || `Tema ${indexTema + 1}`}</strong>
+                  <ul>
+                    {mediaTema.map((media, indexPergunta) => (
+                      <li key={indexPergunta}>
+                        Pergunta {indexPergunta + 1}: {media !== null ? `${media}º` : 'Nenhuma posição selecionada ainda.'}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <form onSubmit={handleSenhaSubmit}>
+              <input
+                type="password"
+                placeholder="Digite a senha para ver as médias"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+              />
+              <button type="button" onClick={handleSenhaSubmit}>Ver Posições</button>
+            </form>
+          )}
+        </>
+      )}
+    </form>
+  </div>
+);
 }
 
 export default App;

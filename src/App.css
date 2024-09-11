@@ -1,32 +1,189 @@
 /* src/App.css */
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+/* Reset básico */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.App {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
+/* Estilizando a scrollbar para navegadores Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px; /* Largura da scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #e0f2f1; /* Cor do trilho da scrollbar */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #26a69a; /* Cor da "thumb" da scrollbar */
+  border-radius: 10px;
+  border: 3px solid #e0f2f1; /* Cor do fundo ao redor da "thumb" */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #00796b; /* Cor da "thumb" ao passar o mouse */
+}
+
+/* Estilo do pop-up */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.popup p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.popup button {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.popup button:hover {
+  background-color: #218838;
+}
+
+.info-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.conceito {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #666;
+}
+
+/* Estilizando a scrollbar para o Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #26a69a #e0f2f1;
+}
+
+/* Para navegadores baseados em Webkit que suportam a nova especificação CSS */
+* {
+  scrollbar-width: thin; /* Define a largura da scrollbar como fina */
+  scrollbar-color: #26a69a #e0f2f1; /* Cor da "thumb" e do trilho */
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-image: url("images/PlanoDeFundo.png"); /* Caminho da imagem */
+  background-size: cover; /* Garante que a imagem cubra toda a tela */
+  background-position: center center; /* Centraliza a imagem */
+  background-attachment: fixed; /* Impede que o fundo se mova ao rolar */
+  background-repeat: no-repeat; /* Não repete a imagem */
+  color: #2d3436;
+  line-height: 1.6;
+}
+
+.App {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0f2f1;
 }
 
 h1, h2, h3 {
   text-align: center;
-  color: #333;
+  color: #2d3436;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 2.5em;
+  font-weight: 700;
+  color: #26a69a;
+  letter-spacing: 1.5px;
+}
+
+h2 {
+  font-size: 2em;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #2d3436;
+}
+
+h3 {
+  font-size: 1.75em;
+  font-weight: 500;
+  margin-bottom: 15px;
+  color: #37474f;
+}
+
+/* Estilo para cada tema com cores diferentes */
+.tema-ambiental .question-card {
+  background: rgba(200, 230, 201, 0.9);
+  border-color: #81c784;
+}
+
+.tema-social .question-card {
+  background: rgba(255, 245, 157, 0.9);
+  border-color: #ffd54f;
+}
+
+.tema-governanca .question-card {
+  background: rgba(179, 229, 252, 0.9);
+  border-color: #4fc3f7;
 }
 
 .tema-titulo {
   text-align: center;
-  font-size: 20px;
-  color: #3e454d;
+  font-size: 22px;
+  color: #004d40;
   margin-top: 30px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.tema-titulo:after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: #004d40;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+.tema-descricao {
+  text-align: center; /* Centraliza o texto */
+  color: #888; /* Cor mais suave */
+  margin-bottom: 10px; /* Espaçamento abaixo do texto */
 }
 
 form {
@@ -35,32 +192,71 @@ form {
 }
 
 .grupo-selecao {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: rgba(236, 240, 241, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
 }
 
 .grupo-label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #004d40;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.grupo-label input {
+  margin-right: 10px;
+}
+
+.grupo-label:hover {
+  color: #26a69a;
 }
 
 .question-card {
-  margin-bottom: 20px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
+  margin-bottom: 25px;
+  padding: 25px;
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.question-card:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(38, 166, 154, 0.2), transparent);
+  transition: all 0.7s;
+  transform: skewX(-30deg);
+}
+
+.question-card:hover:before {
+  left: 100%;
+}
+
+.question-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .question-card h3 {
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: #495057;
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #004d40;
 }
 
 .question-card p {
-  margin-bottom: 15px;
-  font-size: 14px;
-  color: #6c757d;
+  margin-bottom: 18px;
+  font-size: 15px;
+  color: #607d8b;
 }
 
 .options {
@@ -72,31 +268,60 @@ form {
 .radio-label {
   display: flex;
   align-items: center;
+  font-size: 16px;
+  color: #004d40;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .radio-label input {
-  margin-right: 5px;
+  margin-right: 8px;
+  accent-color: #26a69a;
+  transform: scale(1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.radio-label input:checked {
+  animation: pulse 0.4s ease-in-out;
+  background-color: #00897b; /* Cor de fundo após a animação */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+    background-color: #66bb6a;
+  }
+  100% {
+    transform: scale(1);
+    background-color: #00897b;
+  }
 }
 
 .legendas {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
-  color: #6c757d;
+  font-size: 14px;
+  color: #b0bec5;
 }
 
 button {
-  padding: 10px;
+  padding: 15px 20px;
   border: none;
-  background-color: #28a745;
+  background-color: #26a69a;
   color: white;
-  font-size: 16px;
-  border-radius: 4px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 button:hover {
-  background-color: #218838;
+  background-color: #00897b;
+  transform: translateY(-2px);
 }
 
 ul {
@@ -105,13 +330,49 @@ ul {
 }
 
 li {
-  background-color: #f9f9f9;
-  padding: 10px;
-  margin-bottom: 5px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+  background-color: #ffffff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #e0f2f1;
+  transition: background-color 0.3s ease;
+}
+
+li:hover {
+  background-color: #e0f7fa;
 }
 
 p {
-  color: #666;
+  color: #455a64;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.75em;
+  }
+
+  h3 {
+    font-size: 1.5em;
+  }
+
+  .question-card {
+    padding: 20px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 10px 15px;
+  }
 }
